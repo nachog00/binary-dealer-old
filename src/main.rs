@@ -1,5 +1,5 @@
 extern crate tokio;
-use axum::{serve, Router};
+use axum::{routing::get, serve, Router};
 
 use tokio::net::TcpListener;
 
@@ -19,7 +19,9 @@ async fn main() {
             .expect("listener.local_addr() to unwrap")
     );
 
-    let rt: Router = Router::new().nest_service("/assets", ServeDir::new("assets"));
+    let rt: Router = Router::new()
+        .route("/", get(|| async { "Hi from The Server" }))
+        .nest_service("/assets", ServeDir::new("assets"));
 
     serve(listener, rt.layer(TraceLayer::new_for_http()))
         .await
